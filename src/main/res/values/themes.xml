@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Ordinary app theme, used by MainActivity (the dev harness). -->
+    <style name="Theme.KipatProbe" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!--
+      The theme under test.
+
+      Every item here matters for the over-app illusion:
+
+      windowIsTranslucent      the window is composited over whatever is behind it
+                               instead of getting its own opaque surface. Without
+                               this, nothing else in the list has any effect.
+      windowBackground         must be transparent, or you are just drawing a
+                               coloured sheet over the previous app.
+      windowIsFloating         false: we want edge-to-edge, not a dialog box.
+      backgroundDimEnabled     false: the system dim is a flat scrim and it will
+                               fight whatever backdrop treatment we choose.
+      windowDisablePreview     true: kills the starting-window (splash) frame.
+                               Leave it on and you get a white flash before the
+                               reveal, which is the single most expensive-looking
+                               50 ms in the product.
+      windowAnimationStyle     @null: no enter/exit animation, so the reveal owns
+                               all of the motion.
+      windowShowWallpaper      false on purpose. Setting it true makes the window
+                               show the *wallpaper* behind it, not the prior app —
+                               it is a tempting but wrong fix if the backdrop
+                               comes back black.
+    -->
+    <style name="Theme.Kipat.Tap" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowDisablePreview">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowShowWallpaper">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+</resources>

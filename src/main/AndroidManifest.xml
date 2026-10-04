@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!-- required=false so the app still installs on non-NFC devices; the probe
+         degrades to the adb harness there. -->
+    <uses-feature android:name="android.hardware.nfc" android:required="false" />
+
+    <application
+        android:allowBackup="false"
+        android:label="Kipat Probe"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.KipatProbe">
+
+        <!-- Dev harness: writes test tags, launches the probe manually. -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!--
+          taskAffinity=""      puts this activity in its own task so an NFC tap
+                               does NOT drag MainActivity (and the rest of the
+                               app's task) to the front behind the reveal.
+          launchMode           singleTask, paired with the empty affinity, so a
+                               second tap reuses the same instance via
+                               onNewIntent instead of stacking reveals.
+          excludeFromRecents   the reveal is a moment, not a destination.
+          noHistory            true in production; left false here so you can
+                               rotate/inspect during a test run.
+        -->
+        <activity
+            android:name=".TapExperienceActivity"
+            android:theme="@style/Theme.Kipat.Tap"
+            android:taskAffinity=""
+            android:launchMode="singleTask"
+            android:excludeFromRecents="true"
+            android:noHistory="false"
+            android:resizeableActivity="true"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode"
+            android:exported="true">
+
+            <!-- Real NFC path. An Android Application Record in the tag pins the
+                 tap to this package; this filter is what handles it once the
+                 package is resolved. Keep the host/pathPrefix narrow. -->
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="https" android:host="kipat.app" android:pathPrefix="/c/" />
+            </intent-filter>
+
+            <!-- Dev-only harness path. Custom scheme, no browser competes for it:
+                 adb shell am start -a android.intent.action.VIEW -d "kipatprobe://tap/TEST123"
+                 Delete this filter before shipping anything. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="kipatprobe" android:host="tap" />
+            </intent-filter>
+        </activity>
+
+    </application>
+</manifest>
